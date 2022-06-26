@@ -6,12 +6,14 @@ const gameOverSound = new Audio("music/gameover.mp3");
 const moveSound =  new Audio("music/move.mp3");
 const musicSound = new Audio("music/music.mp3");
 
-let speed = 19;
 let score = 0;
 let lastPaintTime = 0;
 let snakeArr = [
     {x:13, y:15}
 ];
+
+
+var speed = 10;
 
 food = {x:6, y:7 };
 
@@ -21,7 +23,7 @@ food = {x:6, y:7 };
 function main(ctime) {
 
     window.requestAnimationFrame(main);
-
+    speed= 10+ 0.6*snakeArr.length;
     if((ctime - lastPaintTime)/1000 <  1/speed ){
         return ;
     }
@@ -54,7 +56,7 @@ function gameEngine(){
    
 
 
-    //Part 1: Update the snake array and food
+    // Part 1: Update the snake array and food
     if(isCollide(snakeArr)){
        
         gameOverSound.play();
@@ -143,31 +145,99 @@ else
 
 
 window.requestAnimationFrame(main);
+
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchmove",handleTouchMove, false);
+
+var xStart = null;
+var yStart = null;
+
+function getTouches(evt){
+    return evt.touches || evt.originalEvent.touches;
+};
+
+function handleTouchStart(evt)
+{
+    const firstTouch = getTouches(evt)[0];
+
+    xStart = firstTouch.clientX;
+    yStart = firstTouch.clientY;
+  
+};
+
+function handleTouchMove(evt)
+{
+    if( !xStart || !yStart)
+     return ;
+
+     var xEnd = evt.touches[0].clientX;
+     var yEnd = evt.touches[0].clientY;
+
+     var xDiff = xEnd - xStart;
+     var yDiff = yEnd - yStart;
+
+     if (Math.abs(xDiff)> Math.abs(yDiff) )
+     {
+        if( xDiff > 0)
+        {
+            if(inputDir.x != -1 || snakeArr.length === 1){
+                inputDir.x = 1;
+                inputDir.y = 0;
+            }
+        }
+        else
+        {
+            if(inputDir.x != 1 || snakeArr.length === 1){
+                inputDir.x = -1;
+                inputDir.y = 0;
+            }
+        }
+
+     }
+     else
+     {
+        if(yDiff> 0)
+        {
+            if(inputDir.y != -1 || snakeArr.length === 1){
+                inputDir.x = 0;
+                inputDir.y = 1;
+            }
+        }
+        else 
+        {
+            if( inputDir.y != 1 || snakeArr.length === 1){
+                inputDir.x = 0;
+                inputDir.y = -1;
+            }
+        }
+     }
+     xStart = null;
+     yStart = null;
+};
+
+
+
 window.addEventListener('keydown', e=>{
-    inputDir = {x: 0, y:1};
+    inputDir = {x: 0, y:-1};
     moveSound.play();
     switch (e.key)
     {
         case "ArrowUp":
-            console.log("ArrowUp");
             inputDir.x = 0;
             inputDir.y = -1;
             break;
 
         case "ArrowDown":
-            console.log("ArrowDown");
             inputDir.x = 0;
             inputDir.y = 1;
             break;
 
         case "ArrowLeft":
-            console.log("ArrowLeft");
             inputDir.x = -1;
             inputDir.y = 0;
             break;
 
         case "ArrowRight":
-            console.log("ArrowRight");
             inputDir.x = 1;
             inputDir.y = 0;
             break;
